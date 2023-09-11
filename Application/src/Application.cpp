@@ -1,6 +1,8 @@
+#include <iostream>
+#include <vector>
+#include <string>
 #include "Application.h"
 #include "imgui.h"
-#include <iostream>
 #include "Platform_Utils.h"
 #include "glfw3.h"
 
@@ -103,7 +105,6 @@ namespace MyApp
     {
         static bool checkboxval = false;
         static int test = 3;
-        static bool send_text = false;
 
         /**
          * Docking Space 
@@ -128,17 +129,27 @@ namespace MyApp
         {
             std::cout << test << std::endl;
         }
-        static char text_input[1024 * 16] =
-            "Test\n";
+        static char text_input[1024 * 16] = "Test\n";
         static ImGuiInputTextFlags text_flags = ImGuiInputTextFlags_AllowTabInput;
         ImGui::CheckboxFlags("ReadOnly", &text_flags, ImGuiInputTextFlags_ReadOnly);
         ImGui::CheckboxFlags("AllowTabInput", &text_flags, ImGuiInputTextFlags_AllowTabInput);
         ImGui::CheckboxFlags("CtrlEnterForNewLine", &text_flags, ImGuiInputTextFlags_CtrlEnterForNewLine);
         ImGui::InputTextMultiline("##source", text_input, IM_ARRAYSIZE(text_input), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), text_flags);
+
+
+        static std::vector<std::string> list;
         if (ImGui::Button("Send Text"))
         {
-            send_text = true;
+            std::string str = text_input;
+            list.push_back(str);
         }
+        if (ImGui::Button("Remove"))
+        {
+            if(!list.empty()){
+                list.pop_back();
+            }
+        }
+
         ImGui::End();
 
         /* *********************************************************************** */
@@ -167,17 +178,13 @@ namespace MyApp
                 ImGui::TableSetupColumn("Header");
             }
             ImGui::TableHeadersRow();
-            for (int row = 0; row < 5; row++)
+            for(std::string s : list)
             {
                 ImGui::TableNextRow();
                 for (int column = 0; column < test; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    if(send_text)
-                    {
-                        strcpy(buf,text_input);
-                        send_text = false;
-                    }
+                    strcpy(buf,s.c_str());
                     ImGui::TextUnformatted(buf);
                 }
             }
