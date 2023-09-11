@@ -1,7 +1,6 @@
-*.dll
 *.exe
 *.o
 *.out
 *.so
-.build
+build
 .vscode
