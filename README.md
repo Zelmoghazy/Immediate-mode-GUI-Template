@@ -11,6 +11,14 @@
        style="border-radius: 30px;"/>
 </p>
 
+# Demo 
+
+<p align="center">
+  <img src="./Snapshots/3.gif"
+       width="100%" 
+       style="border-radius: 30px;"/>
+</p>
+
 - [x] Cross Platform
 - [x] Rendering Backend boiler plate
 - [x] Docking
