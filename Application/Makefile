@@ -31,12 +31,13 @@ all: $(BUILD_DIR)/$(EXEC)
 
 $(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
 	$(CC) -c  $< -o $@ $(CFLAGS)
+	
 $(BUILD_DIR)/$(EXEC): $(OBJ)
 	$(CC)  $^ -o $@ $(CFLAGS)
 
 $(BUILD_DIR):
 	mkdir $@
-	cp ./OpenGL/lib/*.dll ./$(BUILD_DIR)/
+	$(foreach DIR,$(LIB_DIRS),cp $(DIR)*.dll  ./$(BUILD_DIR)/)
 	$(info SRC_DIRS : $(CODE_DIRS))
 	$(info INC_DIRS : $(INC_DIRS))
 	$(info INCS     : $(INCS))
