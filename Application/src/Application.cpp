@@ -1,10 +1,15 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
+
+#include "glew.h"
+#include "glfw3.h"
 #include "Application.h"
 #include "imgui.h"
 #include "Platform_Utils.h"
-#include "glfw3.h"
+#include "Image.h"
+
 
 namespace MyApp
 {
@@ -104,7 +109,8 @@ namespace MyApp
     void RenderUI(GLFWwindow* window)
     {
         static bool checkboxval = false;
-        static int test = 3;
+        static int int_value = 3;
+        static int text_input_size = 10;
 
         /**
          * Docking Space 
@@ -115,28 +121,37 @@ namespace MyApp
         /* ***************** */
 
         /* First Window */
-
         ImGui::Begin("Hello, ImGui!", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
         // ImGui::SetWindowSize(ImVec2(500,500));
         ImGui::Text("This is a simple ImGui example.");
+        /* Set position of widget */
+        ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX()+100 ,ImGui::GetCursorPosY()));
         if (ImGui::Button("Quit"))
         {
             glfwSetWindowShouldClose(window, true);
         }
+        ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX()+100 ,ImGui::GetCursorPosY()));
         ImGui::Checkbox("Checkbox", &checkboxval);
-        ImGui::SliderInt("Int Slider", &test, 1, 10);
+        ImGui::SliderInt("Int Slider", &int_value, 1, 10);
         if (ImGui::Button("Int value"))
         {
-            std::cout << test << std::endl;
+            std::cout << int_value << std::endl;
         }
+        /* Text Input */
         static char text_input[1024 * 16] = "Test\n";
         static ImGuiInputTextFlags text_flags = ImGuiInputTextFlags_AllowTabInput;
         ImGui::CheckboxFlags("ReadOnly", &text_flags, ImGuiInputTextFlags_ReadOnly);
+        /* Place widget on the same line specify spacing */
+        ImGui::SameLine(0, 20);
         ImGui::CheckboxFlags("AllowTabInput", &text_flags, ImGuiInputTextFlags_AllowTabInput);
+        ImGui::SameLine(0, 20);
         ImGui::CheckboxFlags("CtrlEnterForNewLine", &text_flags, ImGuiInputTextFlags_CtrlEnterForNewLine);
-        ImGui::InputTextMultiline("##source", text_input, IM_ARRAYSIZE(text_input), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), text_flags);
+        ImGui::InputTextMultiline("##source", text_input, IM_ARRAYSIZE(text_input), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * text_input_size), text_flags);
+        /* Text Input size */
+        ImGui::SliderInt("Input size", &text_input_size, 1, 10);
 
 
+        /* Save Text from Text input */
         static std::vector<std::string> list;
         if (ImGui::Button("Send Text"))
         {
@@ -161,19 +176,19 @@ namespace MyApp
             ImGui::End();
         }
 
-        /* Table */
+        /****************** Table ************************************************/
         static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchSame |
-                                       ImGuiTableFlags_Resizable |
-                                       ImGuiTableFlags_BordersOuter |
-                                       ImGuiTableFlags_BordersInner |
-                                       ImGuiTableFlags_BordersV |
-                                       ImGuiTableFlags_BordersH |
-                                       ImGuiTableFlags_ContextMenuInBody;
+                                             ImGuiTableFlags_Resizable         |
+                                             ImGuiTableFlags_BordersOuter      |
+                                             ImGuiTableFlags_BordersInner      |
+                                             ImGuiTableFlags_BordersV          |
+                                             ImGuiTableFlags_BordersH          |
+                                             ImGuiTableFlags_ContextMenuInBody;
         static char buf[1024 * 16] = "Table";
         ImGui::Begin("Table", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-        if (ImGui::BeginTable("table1", test, table_flags))
+        if (ImGui::BeginTable("table1", int_value, table_flags))
         {
-            for (int i = 0; i < test; i++)
+            for (int i = 0; i < int_value; i++)
             {
                 ImGui::TableSetupColumn("Header");
             }
@@ -181,7 +196,7 @@ namespace MyApp
             for(std::string s : list)
             {
                 ImGui::TableNextRow();
-                for (int column = 0; column < test; column++)
+                for (int column = 0; column < int_value; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
                     strcpy(buf,s.c_str());
@@ -194,13 +209,31 @@ namespace MyApp
         /* *********************************************************************** */
 
 
-         /* Windows Open and save dialogs */
-        ImGui::Begin("Windows Dialogs");
-        if(ImGui::Button("Open")){
-            std::string filepath = Windows_file_dialog::OpenFile("All Files (*.*)\0*.*\0",window);
-            std::cout << filepath << std::endl;
+        /**
+         * Loading an Image 
+         */
+        static std::string path = "assets/pic1.jpg";   // Initial Path
+        static Image img(path.c_str());                // Initial Image
+        static bool loaded = true;
+
+        ImGui::Begin("OpenGL Texture");
+        ImGui::Text("pointer = %p", img.image_texture);
+        ImGui::Text("size = %d x %d", img.width, img.height);
+        ImGui::SliderInt("Width", &img.width, 1, 1000);
+        ImGui::SliderInt("Height", &img.height, 1, 1000);
+        ImGui::Image((void*)(intptr_t)img.image_texture, ImVec2(img.width, img.height));
+
+        if (ImGui::Button("Open"))
+        {
+            path = Windows_file_dialog::OpenFile("All Files (*.*)\0*.*\0", window);
+            std::replace(path.begin(), path.end(), '\\', '/');   // Fix path
+            std::cout << path.c_str() << std::endl;              // Debugging
+            loaded = img.GetImageFromPath(path.c_str());        
         }
-        if(ImGui::Button("Save")){
+        if (!loaded)
+        {
+            /* Colored Text */
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Couldn't load Image.");
         }
         ImGui::End();
         /* ***************************** */

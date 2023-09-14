@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
+
 #include "glew.h"
 #include "glfw3.h"
 #include "imgui.h"
@@ -7,7 +10,6 @@
 #include "imgui_impl_opengl3.h"
 #include "Application.h"
 #include "Style.h"
-#include "Image.h"
 
 
 int main(void) 
@@ -33,9 +35,6 @@ int main(void)
         glfwTerminate();
         return -1;
     }
-
-        /* Load Images */
-    Image img("assets/pic1.jpg");
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -63,13 +62,15 @@ int main(void)
 
 
     // Main loop
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) 
+    {
         glfwPollEvents();
 
         // Start ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        // Push custom font
         ImGui::PushFont(pFont);
         
 
@@ -78,19 +79,7 @@ int main(void)
         MyApp::RenderUI(window);
         // ImGui::ShowDemoWindow();
 
-
-        /**
-         * Loading an Image 
-         */
-        ImGui::Begin("OpenGL Texture");
-        ImGui::Text("pointer = %p", img.image_texture);
-        ImGui::Text("size = %d x %d", img.width, img.height);
-        ImGui::SliderInt("Width", &img.width, 1, 1000);
-        ImGui::SliderInt("Height", &img.height, 1, 1000);
-        ImGui::Image((void*)(intptr_t)img.image_texture, ImVec2(img.width, img.height));
-        ImGui::End();
         /* *************************************************************************************** */
-
 
         /* Code ends  here */
         ImGui::PopFont();

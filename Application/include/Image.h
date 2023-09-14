@@ -2,7 +2,6 @@
 
 #include "glew.h"
 
-
 class Image
 {
 public:
@@ -11,4 +10,6 @@ public:
     int height;
 
     Image(const char* filename);
+    bool GetImageFromPath(const char* filename);
+
 };
