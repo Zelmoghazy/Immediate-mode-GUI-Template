@@ -1,0 +1,12 @@
+src:= ..\\Main.cpp ..\\Imgui\\src\\*.cpp ..\\src\\*.cpp
+inc:= -I ..\\Imgui\\include -I ..\\include -I ..\\GLFW\\include\\GL -I ..\\GLFW\\include\\GLFW
+lib_dir:= -LIBPATH:"..\GLFW\lib"
+lib:= opengl32.lib user32.lib glfw3.lib glew32.lib gdi32.lib imm32.lib comdlg32.lib shell32.lib kernel32.lib
+
+all:
+	mkdir MSVC && cd MSVC && \
+	"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 \& \
+	cl -EHsc -Zi $(src) $(inc) $(lib) -MD -link $(lib_dir)
+
+clean:
+	rm -fR ./MSVC
