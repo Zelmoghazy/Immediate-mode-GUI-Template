@@ -4,7 +4,7 @@ lib_dir:= -LIBPATH:"..\GLFW\lib"
 lib:= opengl32.lib user32.lib glfw3.lib glew32.lib gdi32.lib imm32.lib comdlg32.lib shell32.lib kernel32.lib
 
 all:
-	mkdir MSVC && cd MSVC && \
+	mkdir MSVC && cd MSVC && cp ../GLFW/lib/*.dll ./ && \
 	"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 \& \
 	cl -EHsc -Zi $(src) $(inc) $(lib) -MD -link $(lib_dir)
 
